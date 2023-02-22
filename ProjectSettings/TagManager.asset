@@ -6,7 +6,6 @@ TagManager:
   tags:
   - SoundManager
   - Pickable
-  - Interact
   layers:
   - Default
   - TransparentFX
