@@ -28,7 +28,7 @@ public class ReticleSelection : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 20f))
         {
             string hitTag = hit.collider.gameObject.tag;
-            Debug.Log(hitTag);
+            //Debug.Log(hitTag);
             if (hitTag == "Pickable")
             {
                 reticleImage.sprite = pickableReticle;
