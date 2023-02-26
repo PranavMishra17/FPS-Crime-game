@@ -9,6 +9,8 @@ public class ReticleSelection : MonoBehaviour
     [SerializeField] public Image reticleImage;
     [SerializeField] public Sprite defaultReticle, pickableReticle, interactReticle;
 
+    public InventoryManager invM;
+
 
     // Start is called before the first frame update
     void Start()
@@ -48,5 +50,12 @@ public class ReticleSelection : MonoBehaviour
         }
 
         #endregion
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            invM.ToggleInventoryUI();
+            
+        }
+
     }
 }

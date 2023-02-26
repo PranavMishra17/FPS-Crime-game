@@ -36,6 +36,10 @@ public class ObjectAnalyzer : MonoBehaviour
     public GameObject cluePrompt;
     public GameObject clueMenu;
     public GameObject screenshotIcon;
+    private Sprite screenshotSprite;
+    public GameObject levelInventoryObject;
+    public InventoryManager invM;
+    public InventoryItem invI;
 
     public int resWidth = 2550;
     public int resHeight = 3300;
@@ -220,10 +224,12 @@ public class ObjectAnalyzer : MonoBehaviour
         {
             // Capture the screenshot and update the UI image with the new sprite
             StartCoroutine(captureScreenshot());
+
             //screenshotImage.sprite = screenshotSprite;
         }
         isScreenshotAdded = true;
         isDetailAdded = true;
+        //AddItemToInventory();
         //intH.AttemptHarvest(pickedObject);
     }
     IEnumerator captureScreenshot()
@@ -263,16 +269,49 @@ public class ObjectAnalyzer : MonoBehaviour
         AssetDatabase.Refresh();
 
         // Load the image from file
-        /*Texture2D texture = new Texture2D(Screen.width, Screen.height);
+        Texture2D texture = new Texture2D(Screen.width, Screen.height);
         byte[] fileData = System.IO.File.ReadAllBytes(path);
         texture.LoadImage(fileData);
-        */
+        
         // Create a sprite from the texture
-        Sprite screenshotSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        //screenshotSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        //screenshotSprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        //screenshotImage.sprite = screenshotSprite;
 
-        // Assign the sprite to the screenshot image
-        screenshotImage.sprite = screenshotSprite;
+        // Create a new inventory item and set its sprite and info properties
+        InventoryItem newItem = new InventoryItem();
+        newItem.sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        newItem.info = pickedClue;
+        //invM.AddingtoInv();
+
+        // Find the appropriate level inventory game object and get its LevelInventory component
+        //GameObject levelInventoryObject = GameObject.Find("LevelInventory");
+        LevelInventory levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
+
+        // Add the new item to the level inventory
+        levelInventory.AddItem(newItem);
+        Debug.Log("Item added to inventory: " + newItem.info);
+        //invM.ToggleInventoryUI();
     }
+
+    public void AddItemToInventory(string itemInfo, Sprite itemSprite)
+    {
+        // Create a new inventory item and set its sprite and info properties
+        InventoryItem newItem = new InventoryItem();
+        newItem.sprite = itemSprite;
+        newItem.info = pickedClue;
+        //invM.AddingtoInv();
+
+        // Find the appropriate level inventory game object and get its LevelInventory component
+        //GameObject levelInventoryObject = GameObject.Find("LevelInventory");
+        LevelInventory levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
+
+        // Add the new item to the level inventory
+        levelInventory.AddItem(newItem);
+        Debug.Log("Item added to inventory: " + newItem.info);
+        invM.ToggleInventoryUI();
+    }
+
     private IEnumerator CaptureScreenshotAndSetSprite()
     {
         yield return new WaitForEndOfFrame();
