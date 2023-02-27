@@ -407,6 +407,7 @@ MonoBehaviour:
   pickableReticle: {fileID: 21300000, guid: 28e23b36aa1de6445850997b6d386e0c, type: 3}
   interactReticle: {fileID: 21300000, guid: 724ce3efdb865f64fb2a1e719b3e7a47, type: 3}
   invM: {fileID: 731048586}
+  objpicked: 0
 --- !u!114 &192537462 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
@@ -655,6 +656,50 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+--- !u!1 &432990200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 432990202}
+  - component: {fileID: 432990201}
+  m_Layer: 0
+  m_Name: SaveLoadManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &432990201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432990200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07782d56bdaaf804f80c9e1e42ccabb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &432990202
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432990200}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &435900083 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000012957683102, guid: 9f4e5dd2165039f4a878d1c1260761df, type: 3}
@@ -824,10 +869,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1873626405}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 731048586}
+        m_TargetAssemblyTypeName: InventoryManager, Assembly-CSharp
+        m_MethodName: ToggleInventoryUI
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1172,8 +1217,9 @@ GameObject:
   - component: {fileID: 731048581}
   - component: {fileID: 731048586}
   - component: {fileID: 731048585}
+  - component: {fileID: 731048587}
   m_Layer: 5
-  m_Name: Inventory Item Canvas
+  m_Name: InventoryCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1291,6 +1337,26 @@ MonoBehaviour:
   inventoryItemPrefab: {fileID: 7886498515299021403, guid: 2517e8f4d81e75544831aa2676b27d4a, type: 3}
   levelInventory: {fileID: 1153119033}
   fpc: {fileID: 192537462}
+--- !u!114 &731048587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731048580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1939b25bb91bbd74a917df02c705d24b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureData: 
+  textureRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  pixelsPerUnit: 0
 --- !u!1 &801289386
 GameObject:
   m_ObjectHideFlags: 0
@@ -1903,7 +1969,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sprite: {fileID: 0}
-  info: 
+  spritePath: 
+  itemInfo: 
+--- !u!114 &1084682697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084682690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b25639b31412b441ba3e04db0ce299c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemInfo: 
+  spriteBytes: 
 --- !u!4 &1119013610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3225310954190227294, guid: a36e2aae27182bb4b9b1d852d42cbcef, type: 3}
@@ -1943,6 +2024,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04a1fcabf92820c4d91b4de8ecd582cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lvlname: Home
 --- !u!4 &1153119034
 Transform:
   m_ObjectHideFlags: 0
@@ -3559,7 +3641,7 @@ PrefabInstance:
     - target: {fileID: 3054095296511599876, guid: 856142f7f2c5e2c4396bd878d9931fbd, type: 3}
       propertyPath: invM
       value: 
-      objectReference: {fileID: 731048586}
+      objectReference: {fileID: 0}
     - target: {fileID: 3054095296511599876, guid: 856142f7f2c5e2c4396bd878d9931fbd, type: 3}
       propertyPath: player
       value: 
@@ -3572,6 +3654,10 @@ PrefabInstance:
       propertyPath: cluePrompt
       value: 
       objectReference: {fileID: 2137036100}
+    - target: {fileID: 3054095296511599876, guid: 856142f7f2c5e2c4396bd878d9931fbd, type: 3}
+      propertyPath: pickDistance
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3054095296511599876, guid: 856142f7f2c5e2c4396bd878d9931fbd, type: 3}
       propertyPath: screenshotIcon
       value: 

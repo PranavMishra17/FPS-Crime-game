@@ -10,6 +10,7 @@ public class ReticleSelection : MonoBehaviour
     [SerializeField] public Sprite defaultReticle, pickableReticle, interactReticle;
 
     public InventoryManager invM;
+    public bool objpicked = false;
 
 
     // Start is called before the first frame update
@@ -51,10 +52,22 @@ public class ReticleSelection : MonoBehaviour
 
         #endregion
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.I) && !objpicked)
         {
             invM.ToggleInventoryUI();
             
+        }
+
+        if (Input.GetKeyDown(KeyCode.P) && !objpicked)
+        {
+            invM.SaveInventory();
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.L) && !objpicked)
+        {
+            invM.LoadInventory();
+
         }
 
     }

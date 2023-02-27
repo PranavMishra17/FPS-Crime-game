@@ -1,6 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
@@ -15,4 +17,13 @@ public class Inventory : MonoBehaviour
     {
         return items;
     }
+
+    public void ClearItems()
+    {
+        items.Clear();
+    }
+
+    // Save the inventory to a file
+   
+
 }

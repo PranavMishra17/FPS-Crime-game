@@ -8,17 +8,17 @@ using UnityEditor;
 
 public class ObjectAnalyzer : MonoBehaviour
 {
-   // public XEntity.InventoryItemSystem.InstantHarvest intH;
-    //public XEntity.InventoryItemSystem.Interactor intr;
+
     private GameObject pickedObject;
     public GameObject player;
+    public GameObject inventoryCanvas;
     private Vector3 objectOriginalPosition;
     private Quaternion objectOriginalRotation;
     private Vector3 offset;
 
     [SerializeField]
-    public float pickDistance = 3f;
-    private bool viewstate = false;
+    public float pickDistance = 5f;
+    //private bool viewstate = false;
     bool isObjectPicked = false;
 
     public bool takeSS = false;
@@ -36,10 +36,12 @@ public class ObjectAnalyzer : MonoBehaviour
     public GameObject cluePrompt;
     public GameObject clueMenu;
     public GameObject screenshotIcon;
-    private Sprite screenshotSprite;
+    //private Sprite screenshotSprite;
     public GameObject levelInventoryObject;
     public InventoryManager invM;
     public InventoryItem invI;
+    public ReticleSelection retS;
+    public LevelInventory levelInventory;
 
     public int resWidth = 2550;
     public int resHeight = 3300;
@@ -51,6 +53,15 @@ public class ObjectAnalyzer : MonoBehaviour
     private void Start()
     {
         player = GameObject.Find("Player");
+        retS = player.gameObject.GetComponent<ReticleSelection>();
+
+        inventoryCanvas = GameObject.Find("InventoryCanvas");
+        invM = inventoryCanvas.gameObject.GetComponent<InventoryManager>();
+        invI = this.gameObject.GetComponent<InventoryItem>();
+
+        levelInventoryObject = GameObject.Find("LvlInventory");
+        levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
+
     }
     void Update()
     {
@@ -67,6 +78,7 @@ public class ObjectAnalyzer : MonoBehaviour
                     if (!isObjectPicked) // if the object is not currently picked up
                     {
                         isObjectPicked = true;
+                        retS.objpicked = true;
                         pickedObject = hit.collider.gameObject;
                         player.gameObject.GetComponent<FirstPersonController>().Toggle();
 
@@ -106,6 +118,7 @@ public class ObjectAnalyzer : MonoBehaviour
             player.gameObject.GetComponent<FirstPersonController>().Toggle();
             pickedObject = null;
             isObjectPicked = false;
+            retS.objpicked = false;
             cluePrompt.GetComponent<TextMeshProUGUI>().text = "";
             cluePrompt.SetActive(false);
             clueMenu.SetActive(false);
@@ -158,7 +171,7 @@ public class ObjectAnalyzer : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && !isDetailAdded && !isScreenshotAdded)
+        if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && isDetailAdded && !isScreenshotAdded)
         {
             GetScreenshot();
         }
@@ -202,7 +215,7 @@ public class ObjectAnalyzer : MonoBehaviour
     void addClue(string clue)
     {
         pickedClue = clue;
-        //isDetailAdded = true;
+        isDetailAdded = true;
         //intr.InitInteraction();
         clueButtonPrefab1.gameObject.SetActive(false);
         clueButtonPrefab2.gameObject.SetActive(false);
@@ -260,18 +273,18 @@ public class ObjectAnalyzer : MonoBehaviour
 
 
         //Convert to png
-        byte[] imageBytes = croppedTexture.EncodeToPNG();
+        //byte[] imageBytes = croppedTexture.EncodeToPNG();
 
         //Save image to file
-        System.IO.File.WriteAllBytes(path, imageBytes);
+        //System.IO.File.WriteAllBytes(path, imageBytes);
 
         // Refresh the Asset Database
-        AssetDatabase.Refresh();
+        //AssetDatabase.Refresh();
 
         // Load the image from file
-        Texture2D texture = new Texture2D(Screen.width, Screen.height);
-        byte[] fileData = System.IO.File.ReadAllBytes(path);
-        texture.LoadImage(fileData);
+       // Texture2D texture = new Texture2D(Screen.width, Screen.height);
+        //byte[] fileData = System.IO.File.ReadAllBytes(path);
+       // texture.LoadImage(fileData);
         
         // Create a sprite from the texture
         //screenshotSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
@@ -279,81 +292,21 @@ public class ObjectAnalyzer : MonoBehaviour
         //screenshotImage.sprite = screenshotSprite;
 
         // Create a new inventory item and set its sprite and info properties
-        InventoryItem newItem = new InventoryItem();
-        newItem.sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
-        newItem.info = pickedClue;
+        InventoryItem newItem = new InventoryItem(Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f)), pickedClue);
+        newItem.sprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        newItem.itemInfo = pickedClue;
         //invM.AddingtoInv();
 
         // Find the appropriate level inventory game object and get its LevelInventory component
         //GameObject levelInventoryObject = GameObject.Find("LevelInventory");
-        LevelInventory levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
+        //LevelInventory levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
 
         // Add the new item to the level inventory
         levelInventory.AddItem(newItem);
-        Debug.Log("Item added to inventory: " + newItem.info);
+        Debug.Log("Item added to inventory: " + newItem.itemInfo);
         //invM.ToggleInventoryUI();
     }
 
-    public void AddItemToInventory(string itemInfo, Sprite itemSprite)
-    {
-        // Create a new inventory item and set its sprite and info properties
-        InventoryItem newItem = new InventoryItem();
-        newItem.sprite = itemSprite;
-        newItem.info = pickedClue;
-        //invM.AddingtoInv();
-
-        // Find the appropriate level inventory game object and get its LevelInventory component
-        //GameObject levelInventoryObject = GameObject.Find("LevelInventory");
-        LevelInventory levelInventory = levelInventoryObject.GetComponent<LevelInventory>();
-
-        // Add the new item to the level inventory
-        levelInventory.AddItem(newItem);
-        Debug.Log("Item added to inventory: " + newItem.info);
-        invM.ToggleInventoryUI();
-    }
-
-    private IEnumerator CaptureScreenshotAndSetSprite()
-    {
-        yield return new WaitForEndOfFrame();
-
-        if (!takeSS)
-        {
-
-            // Capture the screenshot
-            Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-            texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-            texture.Apply();
-
-            // Calculate the cropping parameters
-            int width = texture.width;
-            int height = texture.height;
-            int size = Mathf.Min(width, height);
-            int x = (width - size) / 2;
-            int y = (height - size) / 2;
-            int offsetX = (width - size) % 2;
-            int offsetY = (height - size) % 2;
-
-            // Crop the texture from the central line
-            Color[] pixels = texture.GetPixels(x + offsetX / 2, y + offsetY / 2, size, size);
-            Texture2D croppedTexture = new Texture2D(size, size, TextureFormat.RGB24, false);
-            croppedTexture.SetPixels(pixels);
-            croppedTexture.Apply();
-
-            // Create a sprite from the cropped texture
-            Sprite screenshotSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), Vector2.zero);
-
-            screenshotImage.sprite = screenshotSprite;
-
-            // Destroy the temporary textures
-            Destroy(texture);
-            Destroy(croppedTexture);
-
-            screenshotIcon.SetActive(false);
-
-            takeSS = true;
-        }
-
-    }
 }
 
 
