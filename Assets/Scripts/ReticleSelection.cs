@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,14 +61,16 @@ public class ReticleSelection : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.P) && !objpicked)
         {
-            invM.SaveInventory();
+            //invM.SaveInventory();
+            DateTime currentDateTime = DateTime.Now;
+            SaveLoadManager.SaveGame(currentDateTime.ToString());
 
         }
 
         if (Input.GetKeyDown(KeyCode.L) && !objpicked)
         {
-            invM.LoadInventory();
-
+            //invM.LoadInventory();
+            SaveLoadManager.LoadGame();
         }
 
     }

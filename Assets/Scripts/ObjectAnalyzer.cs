@@ -19,12 +19,12 @@ public class ObjectAnalyzer : MonoBehaviour
     [SerializeField]
     public float pickDistance = 5f;
     //private bool viewstate = false;
-    bool isObjectPicked = false;
+    private bool isObjectPicked = false;
 
-    public bool takeSS = false;
-    public bool isDetailAdded = false;
-    public bool isScreenshotAdded = false;
-    public bool cluemenuactive = false;
+    private bool takeSS = false;
+    private bool isDetailAdded = false;
+    private bool isScreenshotAdded = false;
+    private bool cluemenuactive = false;
     public string[] clues = new string[] { "Sword is rather rusty", "Sword doesn't belong here i feel" };
     //public string Clue1 = "None";
     //public string Clue2 = "None";
@@ -45,7 +45,7 @@ public class ObjectAnalyzer : MonoBehaviour
 
     public int resWidth = 2550;
     public int resHeight = 3300;
-
+    
 
     public Image screenshotImage;
    // public XEntity.InventoryItemSystem.InstantHarvest intH;
@@ -71,7 +71,7 @@ public class ObjectAnalyzer : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, pickDistance))
+            if (Physics.Raycast(ray, out hit, 10f))
             {
                 if (hit.collider.gameObject.tag == "Pickable")
                 {
@@ -80,6 +80,8 @@ public class ObjectAnalyzer : MonoBehaviour
                         isObjectPicked = true;
                         retS.objpicked = true;
                         pickedObject = hit.collider.gameObject;
+                        float distance = hit.distance;
+                        pickDistance = distance;
                         player.gameObject.GetComponent<FirstPersonController>().Toggle();
 
                         offset = pickedObject.transform.position - ray.GetPoint(hit.distance);

@@ -367,6 +367,9 @@ public class FirstPersonController : MonoBehaviour
 
     public void Toggle()
     {
+
+        Debug.Log("Toggle called");
+
         if (enableJump) enableJump = false;
         else enableJump = true;
 
