@@ -9,7 +9,7 @@ using UnityEditor;
 public class ObjectAnalyzer : MonoBehaviour
 {
 
-    private GameObject pickedObject;
+    public GameObject pickedObject;
     public GameObject player;
     public GameObject inventoryCanvas;
     private Vector3 objectOriginalPosition;
@@ -19,20 +19,24 @@ public class ObjectAnalyzer : MonoBehaviour
     [SerializeField]
     public float pickDistance = 5f;
     //private bool viewstate = false;
-    private bool isObjectPicked = false;
+    public bool isObjectPicked = false;
 
-    private bool takeSS = false;
-    private bool isDetailAdded = false;
-    private bool isScreenshotAdded = false;
-    private bool cluemenuactive = false;
+    //private bool takeSS = false;
+    public bool isDetailAdded = false;
+    public bool isScreenshotAdded = false;
+    public bool cluemenuactive = false;
     public string[] clues = new string[] { "Sword is rather rusty", "Sword doesn't belong here i feel" };
     //public string Clue1 = "None";
     //public string Clue2 = "None";
     //public string Clue3 = "None";
-    public string pickedClue = "None";
+    public string pickedClue = null;
+    public GameObject buttonHolder;
     public Button clueButtonPrefab1;
     public Button clueButtonPrefab2;
     public Button clueButtonPrefab3;
+    Button clueButton1;
+    Button clueButton2;
+    Button clueButton3;
     public GameObject cluePrompt;
     public GameObject clueMenu;
     public GameObject screenshotIcon;
@@ -45,7 +49,7 @@ public class ObjectAnalyzer : MonoBehaviour
 
     public int resWidth = 2550;
     public int resHeight = 3300;
-    
+    bool mycou = false;
 
     public Image screenshotImage;
    // public XEntity.InventoryItemSystem.InstantHarvest intH;
@@ -74,14 +78,16 @@ public class ObjectAnalyzer : MonoBehaviour
             if (Physics.Raycast(ray, out hit, 10f))
             {
                 if (hit.collider.gameObject.tag == "Pickable")
+               //     if (hit.collider.gameObject.tag == "Pickable" && hit.collider.gameObject == gameObject)
                 {
                     if (!isObjectPicked) // if the object is not currently picked up
                     {
-                        isObjectPicked = true;
+                        this.isObjectPicked = true;
                         retS.objpicked = true;
                         pickedObject = hit.collider.gameObject;
+                        clues = pickedObject.GetComponent<InventoryItem>().clues;
                         float distance = hit.distance;
-                        pickDistance = distance;
+                        this.pickDistance = distance;
                         player.gameObject.GetComponent<FirstPersonController>().Toggle();
 
                         offset = pickedObject.transform.position - ray.GetPoint(hit.distance);
@@ -95,42 +101,58 @@ public class ObjectAnalyzer : MonoBehaviour
             }
         }
 
-        if (Input.GetKey(KeyCode.E) && isObjectPicked && pickedObject != null && !isDetailAdded)
+        if (Input.GetKeyDown(KeyCode.E) && isObjectPicked && pickedObject != null && !pickedObject.GetComponent<InventoryItem>().addedtoInv)
+          //  if (Input.GetKeyDown(KeyCode.E) && isObjectPicked && pickedObject != null && !isDetailAdded)
         {
+            Debug.Log("first E called");
             cluemenuactive = true;
+            buttonHolder.SetActive(true);
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            cluePrompt.GetComponent<TextMeshProUGUI>().text = " ";
             cluePrompt.SetActive(false);
+            pickedClue = null;
+            clues = pickedObject.GetComponent<InventoryItem>().clues;
             StartCoroutine(showCluePrompt(clues));
+            //StartCoroutine(showCluePrompt(clues));
         }
-        else if (isDetailAdded)
+        else if (Input.GetKeyDown(KeyCode.E) && pickedObject.GetComponent<InventoryItem>().addedtoInv && isObjectPicked)
         {
+            Debug.Log("second E called");
             cluePrompt.GetComponent<TextMeshProUGUI>().text = "Clue added in files";
             cluePrompt.SetActive(true);
         }
 
-       /* if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && !isDetailAdded && !isScreenshotAdded)
+        if (Input.GetKeyDown(KeyCode.Q) && isObjectPicked && pickedObject != null)
         {
-            GetScreenshot();
-        }*/
+            Debug.Log("first Q called");
+            cluePrompt.GetComponent<TextMeshProUGUI>().text = "  ";
+            cluePrompt.SetActive(false);
 
-        if (Input.GetKey(KeyCode.Q) && isObjectPicked && pickedObject != null)
-        {
             StartCoroutine(MoveObjectToPosition(pickedObject, objectOriginalPosition, objectOriginalRotation, 0.5f));
             player.gameObject.GetComponent<FirstPersonController>().Toggle();
             pickedObject = null;
             isObjectPicked = false;
             retS.objpicked = false;
-            cluePrompt.GetComponent<TextMeshProUGUI>().text = "";
-            cluePrompt.SetActive(false);
+            
+            
             clueMenu.SetActive(false);
-            clueButtonPrefab1.gameObject.SetActive(false);
-            clueButtonPrefab2.gameObject.SetActive(false);
-            clueButtonPrefab3.gameObject.SetActive(false);
+            //buttonHolder.SetActive(false);
+
             cluemenuactive = false;
+
             Cursor.visible = false;
-            //focusStateActive = false ;
             Cursor.lockState = CursorLockMode.Locked;
+
+            if(clueButton1 != null)
+            {
+                Destroy(clueButton1.gameObject);
+                Destroy(clueButton2.gameObject);
+                Destroy(clueButton3.gameObject);
+            }
+           
         }
 
         if (isObjectPicked && !cluemenuactive)
@@ -146,8 +168,6 @@ public class ObjectAnalyzer : MonoBehaviour
             pickedObject.transform.Rotate(Vector3.up, -mouseX, Space.World);
             pickedObject.transform.Rotate(Vector3.right, mouseY, Space.World);
         }
-
-
 
         IEnumerator MoveObjectToPosition(GameObject obj, Vector3 targetPos, Quaternion targetRot, float time)
         {
@@ -165,68 +185,82 @@ public class ObjectAnalyzer : MonoBehaviour
 
             obj.transform.position = targetPos;
             obj.transform.rotation = targetRot;
+            pickedObject = null;
         }
 
-        // player.gameObject.GetComponent<FirstPersonController>().Toggle();
-
+        if (mycou)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) { addClue(clues[0]); }
+            if (Input.GetKeyDown(KeyCode.Alpha2)) { addClue(clues[1]); }
+            if (Input.GetKeyDown(KeyCode.Alpha3)) { addClue(clues[2]); }
+        }
     }
 
     private void LateUpdate()
     {
-        if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && isDetailAdded && !isScreenshotAdded)
+        if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && pickedObject.GetComponent<InventoryItem>().addedtoInv && !pickedObject.GetComponent<InventoryItem>().ssAdded)
         {
             GetScreenshot();
         }
     }
-    /* 
-     private void ToggleFocusState()
-     {
-         if (focusStateActive)
-         {
-             // Set the focus distance and aperture of the DepthOfField effect based on the position of the objectToFocusOn
-             depthOfField.focusDistance.value = Vector3.Distance(Camera.main.transform.position, objectToFocusOn.transform.position);
-             depthOfField.aperture.value = focusAperture;
-         }
-         else
-         {
-             // Reset the focus distance and aperture to default values
-             depthOfField.focusDistance.value = 10f;
-             depthOfField.aperture.value = normalAperture;
-         }
-     }
-    */
     private IEnumerator showCluePrompt(string[] clues)
     {
-        clueButtonPrefab1.gameObject.SetActive(true);
-        clueButtonPrefab2.gameObject.SetActive(true);
-        clueButtonPrefab3.gameObject.SetActive(true);
+        mycou = true;
+        Debug.Log("show clue prompt called");
 
-        clueButtonPrefab1.GetComponentInChildren<TextMeshProUGUI>().text = clues[0];
-        clueButtonPrefab2.GetComponentInChildren<TextMeshProUGUI>().text = clues[1];
-        clueButtonPrefab3.GetComponentInChildren<TextMeshProUGUI>().text = clues[2];
+        buttonHolder.SetActive(true);
 
-        clueButtonPrefab1.onClick.AddListener(delegate { addClue(clues[0]); });
-        clueButtonPrefab2.onClick.AddListener(delegate { addClue(clues[1]); });
-        clueButtonPrefab3.onClick.AddListener(delegate { addClue(clues[2]); });
-        
-        // Wait until the player chooses a clue
-        yield return new WaitUntil(() => pickedClue != "");
-            
+        // Remove listeners from any existing buttons
+        clueButtonPrefab1.onClick.RemoveAllListeners();
+        clueButtonPrefab2.onClick.RemoveAllListeners();
+        clueButtonPrefab3.onClick.RemoveAllListeners();
+
+        // Instantiate the three clue buttons
+        clueButton1 = Instantiate(clueButtonPrefab1, buttonHolder.transform);
+        clueButton2 = Instantiate(clueButtonPrefab2, buttonHolder.transform);
+        clueButton3 = Instantiate(clueButtonPrefab3, buttonHolder.transform);
+
+        clueButtonPrefab1.onClick.RemoveAllListeners();
+        clueButtonPrefab2.onClick.RemoveAllListeners();
+        clueButtonPrefab3.onClick.RemoveAllListeners();
+
+        // Set the text and listeners for each button
+        clueButton1.GetComponentInChildren<TextMeshProUGUI>().text = clues[0];
+        clueButton1.onClick.AddListener(delegate { addClue(clues[0]); });
+        if (Input.GetKeyDown(KeyCode.Alpha1)){ addClue(clues[0]); }
+
+        clueButton2.GetComponentInChildren<TextMeshProUGUI>().text = clues[1];
+        clueButton2.onClick.AddListener(delegate { addClue(clues[1]); });
+        if (Input.GetKeyDown(KeyCode.Alpha2)) { addClue(clues[1]); }
+
+        clueButton3.GetComponentInChildren<TextMeshProUGUI>().text = clues[2];
+        clueButton3.onClick.AddListener(delegate { addClue(clues[2]); });
+        if (Input.GetKeyDown(KeyCode.Alpha3)) { addClue(clues[2]); }
+
+       // Wait until the player chooses a clue
+        yield return new WaitUntil(() => pickedClue != null);
+        mycou = false;
+
+        // Destroy the clue buttons
+        Destroy(clueButton1.gameObject);
+        Destroy(clueButton2.gameObject);
+        Destroy(clueButton3.gameObject);
+
     }
 
     void addClue(string clue)
     {
         pickedClue = clue;
-        isDetailAdded = true;
-        //intr.InitInteraction();
-        clueButtonPrefab1.gameObject.SetActive(false);
-        clueButtonPrefab2.gameObject.SetActive(false);
-        clueButtonPrefab3.gameObject.SetActive(false);
-        //GetScreenshot();
+        //this.isDetailAdded = true;
+        pickedObject.GetComponent<InventoryItem>().addedtoInv = true;
+
+        //buttonHolder.SetActive(false);
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        cluemenuactive = false;
 
+        cluemenuactive = false;
+        Debug.Log("Add clue called");
         cluePrompt.GetComponent<TextMeshProUGUI>().text = "Click space to capture. Position object accordingly.";
         cluePrompt.SetActive(true);
 
@@ -242,8 +276,11 @@ public class ObjectAnalyzer : MonoBehaviour
 
             //screenshotImage.sprite = screenshotSprite;
         }
-        isScreenshotAdded = true;
-        isDetailAdded = true;
+
+        pickedObject.GetComponent<InventoryItem>().ssAdded = true;
+        //this.isScreenshotAdded = true;
+        //this.isDetailAdded = true;
+        pickedObject.GetComponent<InventoryItem>().addedtoInv = true;
         //AddItemToInventory();
         //intH.AttemptHarvest(pickedObject);
     }
