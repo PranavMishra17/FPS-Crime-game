@@ -108,10 +108,10 @@ public class ObjectAnalyzer : MonoBehaviour
             cluemenuactive = true;
             buttonHolder.SetActive(true);
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+           // Cursor.lockState = CursorLockMode.None;
+            //Cursor.visible = true;
 
-            cluePrompt.GetComponent<TextMeshProUGUI>().text = " ";
+            cluePrompt.GetComponent<TextMeshProUGUI>().text = " Press the number to pick the clue ";
             cluePrompt.SetActive(false);
             pickedClue = null;
             clues = pickedObject.GetComponent<InventoryItem>().clues;
@@ -125,7 +125,7 @@ public class ObjectAnalyzer : MonoBehaviour
             cluePrompt.SetActive(true);
         }
 
-        if (Input.GetKeyDown(KeyCode.Q) && isObjectPicked && pickedObject != null)
+        if ((Input.GetKeyDown(KeyCode.Q) && isObjectPicked && pickedObject != null) || (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && pickedObject.GetComponent<InventoryItem>().addedtoInv && pickedObject.GetComponent<InventoryItem>().ssAdded))
         {
             Debug.Log("first Q called");
             cluePrompt.GetComponent<TextMeshProUGUI>().text = "  ";
@@ -152,7 +152,6 @@ public class ObjectAnalyzer : MonoBehaviour
                 Destroy(clueButton2.gameObject);
                 Destroy(clueButton3.gameObject);
             }
-           
         }
 
         if (isObjectPicked && !cluemenuactive)
@@ -201,6 +200,8 @@ public class ObjectAnalyzer : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && pickedObject.GetComponent<InventoryItem>().addedtoInv && !pickedObject.GetComponent<InventoryItem>().ssAdded)
         {
             GetScreenshot();
+
+
         }
     }
     private IEnumerator showCluePrompt(string[] clues)

@@ -627,8 +627,8 @@ MonoBehaviour:
   pickedClue: 
   buttonHolder: {fileID: 1052463413}
   clueButtonPrefab1: {fileID: 742369037539070275, guid: e9e281b93444e0247819056b9c19b23d, type: 3}
-  clueButtonPrefab2: {fileID: 5279319089535749762, guid: 0aca546c38bf222419c22f60821ab4c7, type: 3}
-  clueButtonPrefab3: {fileID: 8369290228453289897, guid: 0ab11151d411c6c498f378e4a3c6a681, type: 3}
+  clueButtonPrefab2: {fileID: 8369290228453289897, guid: 0ab11151d411c6c498f378e4a3c6a681, type: 3}
+  clueButtonPrefab3: {fileID: 5279319089535749762, guid: 0aca546c38bf222419c22f60821ab4c7, type: 3}
   cluePrompt: {fileID: 2137036100}
   clueMenu: {fileID: 1688406130}
   screenshotIcon: {fileID: 1866627956}
@@ -2100,9 +2100,9 @@ MonoBehaviour:
   spritePath: 
   itemInfo: 
   clues:
-  - swordy
-  - swordaay
-  - sworrow
+  - 1. swordy
+  - 2. swordaay
+  - 3. sworrow
   addedtoInv: 0
   ssAdded: 0
 --- !u!114 &1084682697
