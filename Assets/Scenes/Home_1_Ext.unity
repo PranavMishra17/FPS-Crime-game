@@ -1517,6 +1517,8 @@ MonoBehaviour:
   inventoryContent: {fileID: 1172480781}
   inventoryItemPrefab: {fileID: 7886498515299021403, guid: 2517e8f4d81e75544831aa2676b27d4a, type: 3}
   levelInventory: {fileID: 1153119033}
+  objectToSave: {fileID: 731048580}
+  saveFileName: savedInv.json
   fpc: {fileID: 192537462}
 --- !u!114 &731048587
 MonoBehaviour:
@@ -1574,6 +1576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 525679bb95934ea4c896ff1737a95453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectName: 
   sprite: {fileID: 0}
   spritePath: 
   itemInfo: 
@@ -2096,6 +2099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 525679bb95934ea4c896ff1737a95453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectName: 
   sprite: {fileID: 0}
   spritePath: 
   itemInfo: 

@@ -14,6 +14,9 @@ public class InventoryManager : MonoBehaviour
     public GameObject inventoryContent;
     public GameObject inventoryItemPrefab;
     public LevelInventory levelInventory;
+
+    public GameObject objectToSave;
+    public string saveFileName = "savedInv.json";
     //public InventorySaveData saveData;
 
     public FirstPersonController fpc;
@@ -35,6 +38,7 @@ public class InventoryManager : MonoBehaviour
     }
     private void Start()
     {
+
     }
 
     public void AddLevelInventory(LevelInventory levelInventory)
@@ -122,6 +126,27 @@ public class InventoryManager : MonoBehaviour
         Debug.Log("Item info: " + info);
     }
 
+    public void SaveGameObject()
+    {
+        // Serialize the game object to a JSON string using JsonUtility
+        string objectData = JsonUtility.ToJson(objectToSave);
+
+        // Save the JSON string to a file
+        System.IO.File.WriteAllText(Application.persistentDataPath + "/" + saveFileName, objectData);
+    }
+
+    public void LoadGameObject()
+    {
+        // Load the JSON string from the file
+        string objectData = System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveFileName);
+
+        // Deserialize the JSON string to a GameObject using JsonUtility
+        GameObject loadedObject = JsonUtility.FromJson<GameObject>(objectData);
+
+        // Instantiate the loaded game object
+        Instantiate(loadedObject);
+    }
+    /*
     // Save the inventory data to a JSON file
     public void SaveInventory()
     {
@@ -189,7 +214,7 @@ public class InventoryManager : MonoBehaviour
             file.Close();
         }
     }
-
+    */
 
     private byte[] SpriteToBytes(Sprite sprite)
     {
@@ -213,5 +238,16 @@ public class InventoryManager : MonoBehaviour
         return serializableSprite;
     }
 
+    private void LateUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            SaveGameObject();
+        }
 
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadGameObject();
+        }
+    }
 }

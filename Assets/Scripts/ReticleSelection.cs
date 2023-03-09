@@ -17,7 +17,11 @@ public class ReticleSelection : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //reticleImage = GetComponentInChildren<Image>();
+        // Loop through all the interactable objects in the scene and load their hasInteracted value from PlayerPrefs
+        foreach (InventoryItem obj in FindObjectsOfType<InventoryItem>())
+        {
+            obj.addedtoInv = PlayerPrefs.HasKey(obj.objectName) && PlayerPrefs.GetInt(obj.objectName) == 1;
+        }
     }
 
     // Update is called once per frame
@@ -59,6 +63,7 @@ public class ReticleSelection : MonoBehaviour
             
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.P) && !objpicked)
         {
             //invM.SaveInventory();
@@ -72,6 +77,6 @@ public class ReticleSelection : MonoBehaviour
             //invM.LoadInventory();
             SaveLoadManager.LoadGame();
         }
-
+        */
     }
 }
