@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    private List<InventoryItem> items = new List<InventoryItem>();
+    public List<InventoryItem> items = new List<InventoryItem>();
 
     public void AddItem(InventoryItem item)
     {

@@ -20,12 +20,13 @@ public class InventoryManager : MonoBehaviour
     //public InventorySaveData saveData;
 
     public FirstPersonController fpc;
-    private string inventorySavePath;
+    public string inventorySavePath;
 
     void Awake()
     {
         // Create the save path using the persistent data path
-        inventorySavePath = Path.Combine(Application.persistentDataPath, "inventory.json");
+        //inventorySavePath = Path.Combine(Application.persistentDataPath, "inventory.json");
+        inventorySavePath = Application.dataPath + "/inventorySaveData.json";
 
         if (FindObjectsOfType(GetType()).Length > 1)
         {
@@ -38,7 +39,7 @@ public class InventoryManager : MonoBehaviour
     }
     private void Start()
     {
-
+        saveFileName = Application.dataPath;
     }
 
     public void AddLevelInventory(LevelInventory levelInventory)
@@ -95,10 +96,10 @@ public class InventoryManager : MonoBehaviour
                 if (itemImage != null)
                 {
                     itemImage.sprite = item.sprite;
-                    Debug.Log("Image component found");
+                    //Debug.Log("Image component found");
                 }
-                Debug.Log(item.sprite.name);
-                Debug.Log(itemImage.sprite.name);
+                //Debug.Log(item.sprite.name);
+                //Debug.Log(itemImage.sprite.name);
 
             }
         }
@@ -126,27 +127,20 @@ public class InventoryManager : MonoBehaviour
         Debug.Log("Item info: " + info);
     }
 
-    public void SaveGameObject()
+    public Sprite pngtoSprite(string pngPath)
     {
-        // Serialize the game object to a JSON string using JsonUtility
-        string objectData = JsonUtility.ToJson(objectToSave);
+        Sprite ssSprite;
+        // Load the image from file
+        Texture2D texture = new Texture2D(Screen.width, Screen.height);
+        byte[] fileData = System.IO.File.ReadAllBytes(pngPath);
+        texture.LoadImage(fileData);
 
-        // Save the JSON string to a file
-        System.IO.File.WriteAllText(Application.persistentDataPath + "/" + saveFileName, objectData);
+        // Create a sprite from the texture
+        //ssSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+        ssSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.width), new Vector2(0.5f, 0.5f));
+
+        return ssSprite;
     }
-
-    public void LoadGameObject()
-    {
-        // Load the JSON string from the file
-        string objectData = System.IO.File.ReadAllText(Application.persistentDataPath + "/" + saveFileName);
-
-        // Deserialize the JSON string to a GameObject using JsonUtility
-        GameObject loadedObject = JsonUtility.FromJson<GameObject>(objectData);
-
-        // Instantiate the loaded game object
-        Instantiate(loadedObject);
-    }
-    /*
     // Save the inventory data to a JSON file
     public void SaveInventory()
     {
@@ -155,12 +149,17 @@ public class InventoryManager : MonoBehaviour
 
         // Get all inventory items in the inventory
         List<InventoryItem> allItems = GetAllItems();
-
+        Debug.Log(allItems);
+        
         // Serialize each item and add it to the serialized items list
-        foreach (InventoryItem item in allItems)
+        foreach (InventoryItem item in levelInventory.GetItems())
         {
+            pngtoSprite(item.spritePath);
+            // InventorySaveData.SerializableInventoryItemsz serializedItem = new InventorySaveData.SerializableInventoryItemsz(
+            //      new SerializableSprite(item.sprite.texture, item.sprite.rect, item.sprite.pixelsPerUnit), item.itemInfo);
             InventorySaveData.SerializableInventoryItemsz serializedItem = new InventorySaveData.SerializableInventoryItemsz(
-                new SerializableSprite(item.sprite.texture, item.sprite.rect, item.sprite.pixelsPerUnit), item.itemInfo);
+                 pngtoSprite(item.spritePath), item.itemInfo, item.spritePath);
+
             serializedItems.Add(serializedItem);
         }
 
@@ -168,6 +167,31 @@ public class InventoryManager : MonoBehaviour
         InventorySaveData saveData = new InventorySaveData();
         saveData.serializedItems = serializedItems;
 
+        // Serialize the save data to a JSON string
+        string jsonString = JsonUtility.ToJson(saveData);
+
+        string saveDirectory = Application.persistentDataPath + "/SaveFiles";
+        if (!Directory.Exists(saveDirectory))
+        {
+            Directory.CreateDirectory(saveDirectory);
+        }
+        // Get a list of existing save files
+        string[] saveFiles = Directory.GetFiles(saveDirectory, "*.json");
+
+        // Generate a new file name
+        int nextFileNumber = saveFiles.Length + 1;
+        string newFileName = "save" + nextFileNumber.ToString() + ".json";
+
+        // Save the data to the new file
+        File.WriteAllText(saveDirectory + "/" + newFileName, jsonString);
+
+        // Write the JSON string to a file in the Assets folder
+        string savePath = Application.dataPath + "/inventorySaveData.json";
+        File.WriteAllText(savePath, jsonString);
+
+
+        inventorySavePath = savePath;
+        /*
         // Open a file stream to the inventory save path and create a new binary formatter
         FileStream file = File.Create(inventorySavePath);
         BinaryFormatter bf = new BinaryFormatter();
@@ -177,44 +201,61 @@ public class InventoryManager : MonoBehaviour
 
         // Close the file stream
         file.Close();
+        */
     }
     public void LoadInventory()
     {
         if (File.Exists(inventorySavePath))
         {
-            // Open a file stream to the inventory save path and create a new binary formatter
-            FileStream file = File.Open(inventorySavePath, FileMode.Open);
-            BinaryFormatter bf = new BinaryFormatter();
+            // Read the entire JSON file and store it as a string
+            string jsonString = File.ReadAllText(inventorySavePath);
 
-            try
-            {
+            InventorySaveData savedata = new InventorySaveData();
+            // Deserialize the JSON string into a new instance of the InventorySaveData class
+            JsonUtility.FromJsonOverwrite(jsonString, savedata);
+
+            // Clear the inventory to remove any existing items
+            levelInventory.ClearItems();
+
+            // Open a file stream to the inventory save path and create a new binary formatter
+            //FileStream file = File.Open(inventorySavePath, FileMode.Open);
+            //BinaryFormatter bf = new BinaryFormatter();
+
+           // try
+           // {
                 // Deserialize the save data and cast it to an InventorySaveData object
-                InventorySaveData saveData = bf.Deserialize(file) as InventorySaveData;
+                //InventorySaveData saveData = bf.Deserialize(file) as InventorySaveData;
 
                 // Clear the inventory to remove any existing items
-                levelInventory.ClearItems();
+                //levelInventory.ClearItems();
 
                 // Loop through each serialized inventory item and add it to the inventory
-                foreach (InventorySaveData.SerializableInventoryItemsz serializedItem in saveData.serializedItems)
+                foreach (InventorySaveData.SerializableInventoryItemsz serializedItem in savedata.serializedItems)
                 {
+                    Debug.Log(serializedItem);
                     // Convert the serializable sprite to a Unity sprite
-                    Sprite sprite = serializedItem.serializableSprite.CreateSprite();
+                    Sprite sprite = serializedItem.serializableSprite;
 
                     // Create a new inventory item and add it to the inventory
-                    InventoryItem item = new InventoryItem(sprite, serializedItem.itemInfo);
+                    InventoryItem item = new InventoryItem(pngtoSprite(serializedItem.spritePath), serializedItem.itemInfo, serializedItem.spritePath);
+                    Debug.Log("item: " + item.itemInfo);
                     levelInventory.AddItem(item);
+                    
                 }
-            }
-            catch (Exception e)
-            {
-                Debug.Log("Failed to load inventory: " + e.Message);
-            }
+
+            UpdateInventoryUI();
+
+           // }
+           // catch (Exception e)
+           // {
+           //      Debug.Log("Failed to load inventory: " + e.Message);
+           // }
 
             // Close the file stream
-            file.Close();
+            // file.Close();
         }
     }
-    */
+    
 
     private byte[] SpriteToBytes(Sprite sprite)
     {
@@ -242,12 +283,12 @@ public class InventoryManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            SaveGameObject();
+            SaveInventory();
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            LoadGameObject();
+            LoadInventory();
         }
     }
 }

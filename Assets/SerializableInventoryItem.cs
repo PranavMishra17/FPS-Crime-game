@@ -15,12 +15,12 @@ public class SerializableInventoryItem: MonoBehaviour
         this.itemInfo = itemName;
         this.spriteBytes = SpriteToBytes(sprite);
     }
-
+    /*
     public InventoryItem ToInventoryItem()
     {
         Sprite sprite = BytesToSprite(spriteBytes);
-        return new InventoryItem(sprite, itemInfo);
-    }
+        return new InventoryItem(sprite, itemInfo, spritePath);
+    }*/
 
     private byte[] SpriteToBytes(Sprite sprite)
     {

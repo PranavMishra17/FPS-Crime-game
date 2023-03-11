@@ -21,6 +21,19 @@ public class InventoryItem : MonoBehaviour
             addedtoInv = PlayerPrefs.GetInt(objectName) == 1;
         }
     }
+
+    // This method returns a JSON string representation of the inventory item
+    public string ToJson()
+    {
+        return JsonUtility.ToJson(this);
+    }
+
+    // This method returns a new inventory item instance deserialized from the specified JSON string
+    public static InventoryItem FromJson(string jsonString)
+    {
+        return JsonUtility.FromJson<InventoryItem>(jsonString);
+    }
+
     public void Interact()
     {
         // Perform the interaction
@@ -30,13 +43,13 @@ public class InventoryItem : MonoBehaviour
             PlayerPrefs.SetInt(objectName, addedtoInv ? 1 : 0);
             PlayerPrefs.Save();
         }
-
-       
     }
+    
 
-    public InventoryItem(Sprite sprite, string itemInfo)
+    public InventoryItem(Sprite sprite, string itemInfo, string spritePath)
     {
         this.sprite = sprite;
         this.itemInfo = itemInfo;
+        this.spritePath = spritePath;
     }
 }

@@ -50,8 +50,9 @@ public class ObjectAnalyzer : MonoBehaviour
     public int resWidth = 2550;
     public int resHeight = 3300;
     bool mycou = false;
-
+    int i = 1;
     public Image screenshotImage;
+    public string screenshotPath;
    // public XEntity.InventoryItemSystem.InstantHarvest intH;
 
     private void Start()
@@ -288,8 +289,8 @@ public class ObjectAnalyzer : MonoBehaviour
     IEnumerator captureScreenshot()
     {
         yield return new WaitForEndOfFrame();
-
-        string path = "Assets/Screenshots/" + "_" + Screen.width + "X" + Screen.height + ".png";
+        i++;
+        string path = "Assets/Screenshots/" + "_"  + i + pickedObject.GetComponent<InventoryItem>().itemInfo + ".png";
 
         Texture2D screenImage = new Texture2D(Screen.width, Screen.height);
         //Get Image from screen
@@ -313,13 +314,14 @@ public class ObjectAnalyzer : MonoBehaviour
 
 
         //Convert to png
-        //byte[] imageBytes = croppedTexture.EncodeToPNG();
+        byte[] imageBytes = croppedTexture.EncodeToPNG();
 
         //Save image to file
-        //System.IO.File.WriteAllBytes(path, imageBytes);
+        System.IO.File.WriteAllBytes(path, imageBytes);
+        screenshotPath = path;
 
         // Refresh the Asset Database
-        //AssetDatabase.Refresh();
+        AssetDatabase.Refresh();
 
         // Load the image from file
        // Texture2D texture = new Texture2D(Screen.width, Screen.height);
@@ -332,9 +334,10 @@ public class ObjectAnalyzer : MonoBehaviour
         //screenshotImage.sprite = screenshotSprite;
 
         // Create a new inventory item and set its sprite and info properties
-        InventoryItem newItem = new InventoryItem(Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f)), pickedClue);
+        InventoryItem newItem = new InventoryItem(Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f)), pickedClue, path);
         newItem.sprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
         newItem.itemInfo = pickedClue;
+        newItem.spritePath = path;
         //invM.AddingtoInv();
 
         // Find the appropriate level inventory game object and get its LevelInventory component

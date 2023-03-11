@@ -53,13 +53,15 @@ public class InventorySaveData : ScriptableObject
     [Serializable]
     public class SerializableInventoryItemsz
     {
-        public SerializableSprite serializableSprite;
+        public Sprite serializableSprite;
         public string itemInfo;
+        public string spritePath;
 
-        public SerializableInventoryItemsz(SerializableSprite serializableSprite, string itemInfo)
+        public SerializableInventoryItemsz(Sprite serializableSprite, string itemInfo, string spritePath)
         {
             this.serializableSprite = serializableSprite;
             this.itemInfo = itemInfo;
+            this.spritePath = spritePath;
         }
     }
 
@@ -77,8 +79,10 @@ public class InventorySaveData : ScriptableObject
 
     public InventorySaveData()
     {
+
     }
 
+    /*
     public List<InventoryItem> Load()
     {
         List<InventoryItem> items = new List<InventoryItem>();
@@ -88,9 +92,9 @@ public class InventorySaveData : ScriptableObject
             texture.LoadImage(itemData.spriteData);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
 
-            InventoryItem item = new InventoryItem(sprite, itemData.itemInfo);
+            InventoryItem item = new InventoryItem(sprite, itemData.itemInfo, itemData.spritePath);
             items.Add(item);
         }
         return items;
-    }
+    }*/
 }
