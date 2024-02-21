@@ -1,7 +1,7 @@
 using System.Collections;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using static Codice.CM.Common.CmCallContext;
 
 namespace XEntity.InventoryItemSystem
 {
@@ -222,30 +222,36 @@ namespace XEntity.InventoryItemSystem
         }
 
         //Finds the interaction settings asset in the editor. Returns null if none is found.
-        public static InteractionSettings FindInteractionSettings() 
+        public static InteractionSettings FindInteractionSettings()
         {
             InteractionSettings settings = null;
 
             if (Application.isPlaying == false)
             {
+#if UNITY_EDITOR
                 var settingsAssets = AssetDatabase.FindAssets($"t:{nameof(InteractionSettings)}");
                 if (settingsAssets?.Length > 0)
                 {
                     string assetPath = AssetDatabase.GUIDToAssetPath(settingsAssets[0]);
                     settings = AssetDatabase.LoadAssetAtPath(assetPath, typeof(InteractionSettings)) as InteractionSettings;
                 }
+#endif
             }
-            else 
+            else
             {
-                var settingsAssets = Resources.FindObjectsOfTypeAll(typeof(InteractionSettings));
-                if (settingsAssets == null || settingsAssets.Length <= 0)
+                if (ItemManager.Instance == null)
                 {
-                    Debug.LogError("No interaction settings were found. Please create one.");
+                    settings = GameObject.FindObjectOfType<ItemManager>(true)?.interactionSettings;
                 }
-                settings = settingsAssets[0] as InteractionSettings;
-            }
+                else settings = ItemManager.Instance.interactionSettings;
 
+                if (settings == null)
+                {
+                    Debug.LogError("No 'InteractionSettings' found. Must assign a 'InteractionSettings' to 'ItemManager'.");
+                }
+            }
             return settings;
         }
+
     }
 }

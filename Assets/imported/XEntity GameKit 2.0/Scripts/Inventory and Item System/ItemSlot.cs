@@ -20,7 +20,7 @@ namespace XEntity.InventoryItemSystem
         //The text for displaying the itemCount.
         private UnityEngine.UI.Text countText;
 
-        private void Awake() 
+        public void Initialize() 
         {
             //The UI variables are assigned here.
             iconImage = transform.Find("Icon Image").GetComponent<UnityEngine.UI.Image>();

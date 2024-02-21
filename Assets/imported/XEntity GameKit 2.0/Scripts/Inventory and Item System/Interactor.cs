@@ -16,8 +16,6 @@ namespace XEntity.InventoryItemSystem
         //This is null if there are no valid target interactable objects. 
         private InteractionTarget interactionTarget;
 
-        
-
         //This is the position at which dropped items will be instantiated (in front of this interactor).
         public Vector3 ItemDropPosition { get { return transform.position + transform.forward; } }
 
@@ -50,7 +48,7 @@ namespace XEntity.InventoryItemSystem
                 if (target != null)
                 {
                     interactionTarget = new InteractionTarget(target, hit.transform.gameObject);
-                    //Utils.HighlightObject(interactionTarget.gameObject);
+                    Utils.HighlightObject(interactionTarget.gameObject);
                 }
                 else interactionTarget = null;
             }
@@ -59,7 +57,7 @@ namespace XEntity.InventoryItemSystem
                 interactionTarget = null;
             }
 
-            if (Input.GetKey(KeyCode.Space) ) InitInteraction();
+            if (Input.GetMouseButtonDown(0)) InitInteraction();
         }
 
         //This returns true if the target position is within the interaction range.
@@ -69,7 +67,7 @@ namespace XEntity.InventoryItemSystem
         }
 
         //This method initilizes an interaction with this interactor if a valid interactabale target exists.
-        public void InitInteraction() 
+        private void InitInteraction() 
         {
             if (interactionTarget == null) return;
             interactionTarget.interactable.OnClickInteract(this);
@@ -80,7 +78,7 @@ namespace XEntity.InventoryItemSystem
         {
             if (inventory.AddItem(item))
             {
-                //if (instance) Destroy(instance);
+                if (instance) Destroy(instance);
                 return true;
             }
             return false;

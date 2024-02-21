@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEditor;
+using System.IO;
 
 public class ObjectAnalyzer : MonoBehaviour
 {
@@ -53,10 +54,14 @@ public class ObjectAnalyzer : MonoBehaviour
     int i = 1;
     public Image screenshotImage;
     public string screenshotPath;
+
+    public List<string> itemList;
    // public XEntity.InventoryItemSystem.InstantHarvest intH;
 
     private void Start()
     {
+        //PlayerPrefs.DeleteAll();
+
         player = GameObject.Find("Player");
         retS = player.gameObject.GetComponent<ReticleSelection>();
 
@@ -102,10 +107,9 @@ public class ObjectAnalyzer : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.E) && isObjectPicked && pickedObject != null && !pickedObject.GetComponent<InventoryItem>().addedtoInv)
+        if (Input.GetKeyDown(KeyCode.E) && isObjectPicked && pickedObject != null && !pickedObject.GetComponent<InventoryItem>().addedtoInv && checkfordouble(pickedObject))
           //  if (Input.GetKeyDown(KeyCode.E) && isObjectPicked && pickedObject != null && !isDetailAdded)
         {
-            Debug.Log("first E called");
             cluemenuactive = true;
             buttonHolder.SetActive(true);
 
@@ -121,14 +125,12 @@ public class ObjectAnalyzer : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.E) && pickedObject.GetComponent<InventoryItem>().addedtoInv && isObjectPicked)
         {
-            Debug.Log("second E called");
             cluePrompt.GetComponent<TextMeshProUGUI>().text = "Clue added in files";
             cluePrompt.SetActive(true);
         }
 
         if ((Input.GetKeyDown(KeyCode.Q) && isObjectPicked && pickedObject != null) || (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && pickedObject.GetComponent<InventoryItem>().addedtoInv && pickedObject.GetComponent<InventoryItem>().ssAdded))
         {
-            Debug.Log("first Q called");
             cluePrompt.GetComponent<TextMeshProUGUI>().text = "  ";
             cluePrompt.SetActive(false);
 
@@ -201,14 +203,11 @@ public class ObjectAnalyzer : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && isObjectPicked && pickedObject != null && pickedObject.GetComponent<InventoryItem>().addedtoInv && !pickedObject.GetComponent<InventoryItem>().ssAdded)
         {
             GetScreenshot();
-
-
         }
     }
     private IEnumerator showCluePrompt(string[] clues)
     {
         mycou = true;
-        Debug.Log("show clue prompt called");
 
         buttonHolder.SetActive(true);
 
@@ -250,6 +249,24 @@ public class ObjectAnalyzer : MonoBehaviour
 
     }
 
+    public bool checkfordouble(GameObject obj)
+    {
+        //List<string> itemList = new List<string>();
+        foreach (InventoryItem itemmmm in levelInventory.GetItems())
+        {
+            itemList.Add(itemmmm.objectName);
+        }
+
+        if (itemList.Contains(obj.GetComponent<InventoryItem>().objectName))
+        {
+            Debug.Log(obj + " is already in the list!");
+            obj.GetComponent<InventoryItem>().addedtoInv = true;
+            obj.GetComponent<InventoryItem>().addedtoInv = true;
+            return false;
+        }
+        else return true;
+    }
+
     void addClue(string clue)
     {
         pickedClue = clue;
@@ -262,7 +279,6 @@ public class ObjectAnalyzer : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         cluemenuactive = false;
-        Debug.Log("Add clue called");
         cluePrompt.GetComponent<TextMeshProUGUI>().text = "Click space to capture. Position object accordingly.";
         cluePrompt.SetActive(true);
 
@@ -275,7 +291,7 @@ public class ObjectAnalyzer : MonoBehaviour
         {
             // Capture the screenshot and update the UI image with the new sprite
             StartCoroutine(captureScreenshot());
-
+            pickedObject.GetComponent<InventoryItem>().objectName = pickedObject.name;
             //screenshotImage.sprite = screenshotSprite;
         }
 
@@ -290,7 +306,21 @@ public class ObjectAnalyzer : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         i++;
-        string path = "Assets/Screenshots/" + "_"  + i + pickedObject.GetComponent<InventoryItem>().itemInfo + ".png";
+
+        // Define the directory path
+        string directoryPath = Application.dataPath + "/StreamingAssets/Screenshots/";
+
+        // Check if the directory doesn't exist
+        if (!Directory.Exists(directoryPath))
+        {
+            // If it doesn't exist, create it
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        // Now you can use the directoryPath variable to construct your complete file path
+        string path = directoryPath + "_" + i + pickedObject.GetComponent<InventoryItem>().itemInfo + ".png";
+
+        //string path = Application.dataPath + "/StreamingAssets/Screenshots/" + "_"  + i + pickedObject.GetComponent<InventoryItem>().itemInfo + ".png";
 
         Texture2D screenImage = new Texture2D(Screen.width, Screen.height);
         //Get Image from screen
@@ -320,24 +350,32 @@ public class ObjectAnalyzer : MonoBehaviour
         System.IO.File.WriteAllBytes(path, imageBytes);
         screenshotPath = path;
 
+
         // Refresh the Asset Database
+#if UNITY_EDITOR
         AssetDatabase.Refresh();
+#endif
+
+
+
 
         // Load the image from file
-       // Texture2D texture = new Texture2D(Screen.width, Screen.height);
+        // Texture2D texture = new Texture2D(Screen.width, Screen.height);
         //byte[] fileData = System.IO.File.ReadAllBytes(path);
-       // texture.LoadImage(fileData);
-        
+        // texture.LoadImage(fileData);
+
         // Create a sprite from the texture
         //screenshotSprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
         //screenshotSprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
         //screenshotImage.sprite = screenshotSprite;
 
         // Create a new inventory item and set its sprite and info properties
-        InventoryItem newItem = new InventoryItem(Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f)), pickedClue, path);
+        InventoryItem newItem = new InventoryItem(Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f)), pickedClue, path, pickedObject.GetComponent<InventoryItem>().objectName);
         newItem.sprite = Sprite.Create(croppedTexture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
         newItem.itemInfo = pickedClue;
         newItem.spritePath = path;
+        newItem.objectName = pickedObject.GetComponent<InventoryItem>().objectName;
+       // pickedObject.GetComponent<InventoryItem>().Interact();
         //invM.AddingtoInv();
 
         // Find the appropriate level inventory game object and get its LevelInventory component
@@ -347,7 +385,7 @@ public class ObjectAnalyzer : MonoBehaviour
         // Add the new item to the level inventory
         levelInventory.AddItem(newItem);
         Debug.Log("Item added to inventory: " + newItem.itemInfo);
-        //invM.ToggleInventoryUI();
+        invM.SaveInventory();
     }
 
 }

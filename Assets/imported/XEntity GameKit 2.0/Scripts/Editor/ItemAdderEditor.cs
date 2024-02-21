@@ -15,7 +15,7 @@ namespace XEntity.InventoryItemSystem.CustomEditors
 
             if (manager == null)
             {
-                Debug.Log("<color=#ff8080>Item Manager does not exist in the current scene</color>");
+                Debug.Log("<color=#ff8080>Item Manager does not exist in the current scene.</color>");
                 return;
             }
             else

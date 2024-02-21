@@ -9,6 +9,8 @@ namespace XEntity.InventoryItemSystem
 
     public class ItemManager : MonoBehaviour
     {
+        public InteractionSettings interactionSettings;
+
         //Singleton instance of this script.
         public static ItemManager Instance { get; private set; }
 

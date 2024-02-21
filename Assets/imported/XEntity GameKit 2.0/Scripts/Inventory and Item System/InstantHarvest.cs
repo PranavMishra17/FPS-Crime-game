@@ -15,7 +15,6 @@ namespace XEntity.InventoryItemSystem
         public void OnClickInteract(Interactor interactor)
         {
             //Attempt to harvest if not harvested already
-            //if(this.gameObject.GetComponent<>)
             AttemptHarvest(interactor);
         }
 
